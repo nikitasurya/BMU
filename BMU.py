@@ -12,23 +12,51 @@ class BMU(self, deviceAdd):
         """
         self.deviceAdd = deviceAdd
         self.bus1 = SMBus(1)
-
-    def readCell(self, cellNum):
+        
+    def cell_1_Voltage(self):
         """
-        Reads the voltage of the cell
-        Returns voltage in mV
+        Reads the voltage of cell 1
+        returns the value in mV
+        """ 
+        cell_1= self.smbusRead(cmd.voltage1)
+        cell_1_voltage= cell_1[1]<<8 | cell_1[0]
+        return cell_1_voltage
+    
+    def cell_2_Voltage(self):
         """
-        self.bus1.read_i2c_block_data(self.deviceAdd,cmd.readcellcommand)
-       
-
+        Reads the voltage of cell 2
+        returns the value in mV
+        """ 
+        cell_2= self.smbusRead(cmd.voltage2)
+        cell_2_voltage= cell_2[1]<<8 | cell_2[0]
+        return cell_2_voltage
+    
+    def cell_3_Voltage(self):
+        """
+        Reads the voltage of cell 3
+        returns the value in mV
+        """ 
+        cell_3= self.smbusRead(cmd.voltage3)
+        cell_3_voltage= cell_3[1]<<8 | cell_3[0]
+        return cell_3_voltage
+    
+    def cell_4_Voltage(self):
+        """
+        Reads the voltage of cell 4
+        returns the value in mV
+        """ 
+        cell_4= self.smbusRead(cmd.voltage4)
+        cell_4_voltage= cell_4[1]<<8 | cell_4[0]
+        return cell_4_voltage
+    
     def totalCellVoltage(self):
         """
         Reads individual cell and sum it up
         Returns total cell voltage in mV
         """
         temp = self.smbusRead(cmd.voltage)
-        #TODO check if correct
-        return temp[1]<<8 | temp[0]
+        total_voltage= temp[1]<<8 | temp[0]
+        return total_voltage
  
     def toggleLED(self):
         """
@@ -36,8 +64,33 @@ class BMU(self, deviceAdd):
         Returns nothing
         """
         val = [0x01<<1, (cmd.LEDToggle & 0xFF), ((cmd.LEDToggle>>8) & 0xFF)]
-        smbusWrite(vale)
+        smbusWrite(val)
 
+    def toggle_CHG_FET(self):
+        """
+        toggles the CHG FET 
+        Returns value to write for toggle
+        """
+        val1=[0x01<<1, cmd.CHGFetToggle , 0x00]
+        smbusWrite(val1)
+        
+    def toggle_DCHG_FET(self):
+        """
+        toggles the discharge FET
+        Returns value to write for toggle 
+        """
+        val2=[0x01<<1, cmd.DCHGFetToggle , 0x00]
+        smbusWrite(val2)
+        
+    def temp_read (self):
+        """ 
+        Reads the temperature of the cell
+        Returns the value in K
+        """
+        cell_temperature= self.smbusRead(cmd.temperature)
+        total_temp=((cell_temperature[1]<<8)|(cell_temperature[0]))/10  #divided by 10 because temperature is in 0.1K unit
+        return total_temp
+    
     def smbusRead(self, value):
         """
         Helper function to read smbus
