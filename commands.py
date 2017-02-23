@@ -85,7 +85,7 @@ atRateTimeToEmpty           = 0x06
 atRateOK                    = 0x07
 temperature                 = 0x08
 voltage                     = 0x09
-<<<<<<< HEAD
+
 current                     = 0x0A
 averageCurrent              = 0x0B
 maxError                    = 0x0C
@@ -118,23 +118,3 @@ BTPDischargeSet             = 0x4A
 BTPChargeSet                = 0x4B
 stateOfHealth               = 0x4F
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-=======
-voltage1                    = 0x3F
-voltage2                    = 0x3E
-voltage3                    = 0x3D
-voltage4                    = 0x3C
-temperature                 = 0x08
->>>>>>> 572c69738220ae037e2fbb54fab5a604322afe02
