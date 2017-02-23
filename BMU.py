@@ -13,31 +13,48 @@ class BMU(self, deviceAdd):
         self.deviceAdd = deviceAdd
         self.bus1 = SMBus(1)
 
-    def readCell(self, cellNum):
-        """
-        Reads the voltage of the cell
-        Returns voltage in mV
-        """
-        self.bus1.read_i2c_block_data(self.deviceAdd,cmd.readcellcommand)
-       
-
     def totalCellVoltage(self):
         """
         Reads individual cell and sum it up
         Returns total cell voltage in mV
         """
         temp = self.smbusRead(cmd.voltage)
-        #TODO check if correct
-        return temp[1]<<8 | temp[0]
+        total_voltage= temp[1]<<8 | temp[0]
+        return total_voltage
  
-    def toggleLED(self):
+   def toggleLED(self):
         """
         Toggle LEDs
         Returns nothing
         """
         val = [0x01<<1, (cmd.LEDToggle & 0xFF), ((cmd.LEDToggle>>8) & 0xFF)]
-        smbusWrite(vale)
+        smbusWrite(val)
 
+    def toggle_CHG_FET(self):
+        """
+        toggles the CHG FET 
+        Returns value to write for toggle
+        """
+        val1=[0x01<<1, cmd.CHGFET_Toggle , 0x00]
+        smbusWrite(val1)
+        
+    def toggle_DCHG_FET(self):
+        """
+        toggles the discharge FET
+        Returns value to write for toggle 
+        """
+        val2=[0x01<<1, cmd.DCHGFET_Toggle , 0x00]
+        smbusWrite(val2)
+        
+    def temp_read (self):
+        """ 
+        Reads the temperature of the cell
+        Returns the value in K
+        """
+        cell_temperature= self.smbusRead(cmd.temperature)
+        total_temp=((cell_temperature[1]<<8)|(cell_temperature[0]))/10  #divided by 10 because temperature is in 0.1K unit
+        return total_temp
+    
     def smbusRead(self, value):
         """
         Helper function to read smbus
