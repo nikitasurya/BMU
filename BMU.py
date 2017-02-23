@@ -18,7 +18,7 @@ class BMU(self, deviceAdd):
         Reads the voltage of cell 1
         Returns the value in mV
         """ 
-        cell_1= self.smbusRead(cmd.voltage1)
+        cell_1= self.smbusRead(cmd.CellVoltage1)
         cell_1_voltage= cell_1[1]<<8 | cell_1[0]
         return cell_1_voltage
     
@@ -27,7 +27,7 @@ class BMU(self, deviceAdd):
         Reads the voltage of cell 2
         Returns the value in mV
         """ 
-        cell_2= self.smbusRead(cmd.voltage2)
+        cell_2= self.smbusRead(cmd.CellVoltage2)
         cell_2_voltage= cell_2[1]<<8 | cell_2[0]
         return cell_2_voltage
     
@@ -36,7 +36,7 @@ class BMU(self, deviceAdd):
         Reads the voltage of cell 3
         returns the value in mV
         """ 
-        cell_3= self.smbusRead(cmd.voltage3)
+        cell_3= self.smbusRead(cmd.CellVoltage3)
         cell_3_voltage= cell_3[1]<<8 | cell_3[0]
         return cell_3_voltage
     
@@ -45,7 +45,7 @@ class BMU(self, deviceAdd):
         Reads the voltage of cell 4
         Returns the value in mV
         """ 
-        cell_4= self.smbusRead(cmd.voltage4)
+        cell_4= self.smbusRead(cmd.CellVoltage4)
         cell_4_voltage= cell_4[1]<<8 | cell_4[0]
         return cell_4_voltage
     
@@ -79,7 +79,7 @@ class BMU(self, deviceAdd):
         toggles the discharge FET
         Returns nothing
         """
-        val2=[0x01<<1, cmd.DCHGFetToggle , 0x00]
+        val2=[0x01<<1, cmd.DSGFetToggle , 0x00]
         smbusWrite(val2)
         
     def temp_read (self):
