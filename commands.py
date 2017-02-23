@@ -16,3 +16,4 @@ DSGFetToggle                = 0x0020
 LEDToggle                   = 0x002B
 
 voltage                     = 0x09
+temperature                 = 0x08
