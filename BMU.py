@@ -12,7 +12,42 @@ class BMU(self, deviceAdd):
         """
         self.deviceAdd = deviceAdd
         self.bus1 = SMBus(1)
-
+    def cell_1_Voltage(self):
+        """
+        Reads the voltage of cell 1
+        returns the value in mV
+        """ 
+        cell_1= self.smbusRead(cmd.voltage1)
+        cell_1_voltage= cell_1[1]<<8 | cell_1[0]
+        return cell_1_voltage
+    
+    def cell_2_Voltage(self):
+        """
+        Reads the voltage of cell 2
+        returns the value in mV
+        """ 
+        cell_2= self.smbusRead(cmd.voltage2)
+        cell_2_voltage= cell_2[1]<<8 | cell_2[0]
+        return cell_2_voltage
+    
+    def cell_3_Voltage(self):
+        """
+        Reads the voltage of cell 3
+        returns the value in mV
+        """ 
+        cell_3= self.smbusRead(cmd.voltage3)
+        cell_3_voltage= cell_3[1]<<8 | cell_3[0]
+        return cell_3_voltage
+    
+    def cell_4_Voltage(self):
+        """
+        Reads the voltage of cell 4
+        returns the value in mV
+        """ 
+        cell_4= self.smbusRead(cmd.voltage4)
+        cell_4_voltage= cell_4[1]<<8 | cell_4[0]
+        return cell_4_voltage
+    
     def totalCellVoltage(self):
         """
         Reads individual cell and sum it up
@@ -22,7 +57,7 @@ class BMU(self, deviceAdd):
         total_voltage= temp[1]<<8 | temp[0]
         return total_voltage
  
-   def toggleLED(self):
+    def toggleLED(self):
         """
         Toggle LEDs
         Returns nothing
@@ -35,7 +70,7 @@ class BMU(self, deviceAdd):
         toggles the CHG FET 
         Returns value to write for toggle
         """
-        val1=[0x01<<1, cmd.CHGFET_Toggle , 0x00]
+        val1=[0x01<<1, cmd.CHGFetToggle , 0x00]
         smbusWrite(val1)
         
     def toggle_DCHG_FET(self):
@@ -43,7 +78,7 @@ class BMU(self, deviceAdd):
         toggles the discharge FET
         Returns value to write for toggle 
         """
-        val2=[0x01<<1, cmd.DCHGFET_Toggle , 0x00]
+        val2=[0x01<<1, cmd.DCHGFetToggle , 0x00]
         smbusWrite(val2)
         
     def temp_read (self):
