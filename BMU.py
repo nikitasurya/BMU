@@ -55,7 +55,7 @@ class BMU(self, deviceAdd):
 
 if __name__ == '__main__':
 
-    bmu = BMU()
+    bmu = BMU(0x0B)
 
     while True:
         print "Important values"
