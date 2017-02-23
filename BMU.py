@@ -12,6 +12,7 @@ class BMU(self, deviceAdd):
         """
         self.deviceAdd = deviceAdd
         self.bus1 = SMBus(1)
+        
     def cell_1_Voltage(self):
         """
         Reads the voltage of cell 1
