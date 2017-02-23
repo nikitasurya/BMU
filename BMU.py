@@ -111,7 +111,30 @@ class BMU(object):
         cell_temperature= self.smbusRead(cmd.temperature)
         total_temp=((cell_temperature[1]<<8)|(cell_temperature[0]))/10  #divided by 10 because temperature is in 0.1K unit
         return total_temp
-    
+   
+    """-------------Battery Status ------------------------"""
+    #TODO check it again when we do a qualified discharge
+    def remainingCapacity(self):
+        """
+        Reads remaining capacity of the battery
+        If BatteryMode()[CAPM] = 0, then the data reports in mAh.
+        If BatteryMode()[CAPM] = 1, then the data reports in 10 mWh.
+        """
+        temp = self.smbusRead(cmd.remainingCapacity)
+        return ((temp[1] << 8) | temp[0])
+
+    """-------------Battery Info ------------------------"""
+    def fullChargeCapacity(self):
+        """
+        Predicted battery capacity when fully charged
+        """
+        temp = self.smbusRead(cmd.fullChargeCapacity)
+        return ((temp[1] << 8) | temp[0])
+ 
+    """-------------Perment Failure Inidcation-------------"""
+
+   
+    """-------------Helper Function------------------------"""
     def smbusRead(self, value):
         """
         Helper function to read smbus
@@ -142,6 +165,6 @@ if __name__ == '__main__':
         print "Temp:", bmu.temp_read()
         print "Current", bmu.currentDraw()
         print "Average Current", bmu.averageCurrentDraw()
-
-
+        print "Remaining Cap", bmu.remainingCapacity()
+        print "Full Charge Cap", bmu.fullChargeCapacity()
         sleep(1)
