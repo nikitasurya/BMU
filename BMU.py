@@ -16,43 +16,28 @@ class BMU(object):
             self.bus1 = SMBus(1)
         else:
             self.bus1 = SMBus(busnum)
+    
+    """------------Voltage Reading------------------------"""
+    def cell_voltage(self, num): 
+        """
+        Reads voltage of cell
+        Requires Cell Number 1 - 4
+        Returns value in mV
+        """
+        if ((num!= 1) and (num!=2) and (num!=3) and (num!=4)):
+            print "Error: Cell number not valid"
+            return -1
 
-    def cell_1_Voltage(self):
-        """
-        Reads the voltage of cell 1
-        Returns the value in mV
-        """ 
-        cell_1= self.smbusRead(cmd.cellVoltage1)
-        cell_1_voltage= cell_1[1]<<8 | cell_1[0]
-        return cell_1_voltage
-    
-    def cell_2_Voltage(self):
-        """
-        Reads the voltage of cell 2
-        Returns the value in mV
-        """ 
-        cell_2= self.smbusRead(cmd.cellVoltage2)
-        cell_2_voltage= cell_2[1]<<8 | cell_2[0]
-        return cell_2_voltage
-    
-    def cell_3_Voltage(self):
-        """
-        Reads the voltage of cell 3
-        returns the value in mV
-        """ 
-        cell_3= self.smbusRead(cmd.cellVoltage3)
-        cell_3_voltage= cell_3[1]<<8 | cell_3[0]
-        return cell_3_voltage
-    
-    def cell_4_Voltage(self):
-        """
-        Reads the voltage of cell 4
-        Returns the value in mV
-        """ 
-        cell_4= self.smbusRead(cmd.cellVoltage4)
-        cell_4_voltage= cell_4[1]<<8 | cell_4[0]
-        return cell_4_voltage
-    
+        if (num == 1):
+            temp = self.smbusRead(cmd.cellVoltage1)
+        if (num == 2):
+            temp = self.smbusRead(cmd.cellVoltage2)
+        if (num == 3):
+            temp = self.smbusRead(cmd.cellVoltage3)
+        if (num == 4):
+            temp = self.smbusRead(cmd.cellVoltage4)
+
+        return ((temp[1]<<8) | temp[0])
 
     def totalCellVoltage(self):
         """
@@ -62,7 +47,36 @@ class BMU(object):
         temp = self.smbusRead(cmd.voltage)
         total_voltage= temp[1]<<8 | temp[0]
         return total_voltage
- 
+
+    """------------Current Reading------------------------"""
+    def currentDraw(self):
+        """
+        Reads the current draw
+        returns current draw in mA
+        """
+        temp = self.smbusRead(cmd.current)
+        current = temp[1]<<8 | temp[0]
+        #2 complement number to represent negative numbers
+        if (current & 0x8000):
+            current = current - 0x10000
+
+        return current
+
+    def averageCurrentDraw(self):
+        """
+        Reads the current draw
+        returns current draw in mA
+        """
+        temp = self.smbusRead(cmd.averageCurrent)
+        aveCurrent = temp[1]<<8 | temp[0]
+        #2 complement number to represent negative numbers
+        if (aveCurrent & 0x8000):
+            aveCurrent = aveCurrent - 0x10000
+
+        return aveCurrent
+
+    """------------LEDCONTROL-----------------------------"""
+
     def toggleLED(self):
         """
         Toggle LEDs
@@ -71,6 +85,7 @@ class BMU(object):
         val = [0x01<<1, (cmd.LEDToggle & 0xFF), ((cmd.LEDToggle>>8) & 0xFF)]
         self.smbusWrite(val)
 
+    """------------Mosfet CONTROL-------------------------"""
     def toggle_CHG_FET(self):
         """
         toggles the CHG FET 
@@ -86,7 +101,8 @@ class BMU(object):
         """
         val2=[0x01<<1, cmd.DSGFetToggle , 0x00]
         self.smbusWrite(val2)
-        
+    
+    """------------Temperature Reading -------------------"""
     def temp_read (self):
         """ 
         Reads the temperature of the cell
@@ -119,12 +135,13 @@ if __name__ == '__main__':
         print "Important values"
         bmu.toggleLED()
         bmu.toggle_DCHG_FET()
-        print "Cell 1:", bmu.cell_1_Voltage()
-        print "Cell 2:", bmu.cell_2_Voltage()
-        print "Cell 3:", bmu.cell_3_Voltage()
+        print "Cell 1:", bmu.cell_voltage(1)
+        print "Cell 2:", bmu.cell_voltage(2)
+        print "Cell 3:", bmu.cell_voltage(3)
         print "total cell voltage:", bmu.totalCellVoltage()
         print "Temp:", bmu.temp_read()
-
+        print "Current", bmu.currentDraw()
+        print "Average Current", bmu.averageCurrentDraw()
 
 
         sleep(1)
