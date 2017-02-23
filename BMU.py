@@ -3,22 +3,26 @@ import commands as cmd #import commands definition from another file
 from time import sleep
 from smbus import SMBus
 
-class BMU(self, deviceAdd):
+class BMU(object):
     
-    def __init__(self, busnum = 1):
+    def __init__(self, deviceAdd =0x0B, busnum = 1):
         """
         Initalise SMBus bus 1
         Returns: nothing
         """
         self.deviceAdd = deviceAdd
-        self.bus1 = SMBus(1)
-        
+        if (busnum != 1 or busnum != 2):
+            print "Error, SMbus needs to be either 1 or 2: Initialising with SMBus 1"
+            self.bus1 = SMBus(1)
+        else:
+            self.bus1 = SMBus(busnum)
+
     def cell_1_Voltage(self):
         """
         Reads the voltage of cell 1
         Returns the value in mV
         """ 
-        cell_1= self.smbusRead(cmd.CellVoltage1)
+        cell_1= self.smbusRead(cmd.cellVoltage1)
         cell_1_voltage= cell_1[1]<<8 | cell_1[0]
         return cell_1_voltage
     
@@ -27,7 +31,7 @@ class BMU(self, deviceAdd):
         Reads the voltage of cell 2
         Returns the value in mV
         """ 
-        cell_2= self.smbusRead(cmd.CellVoltage2)
+        cell_2= self.smbusRead(cmd.cellVoltage2)
         cell_2_voltage= cell_2[1]<<8 | cell_2[0]
         return cell_2_voltage
     
@@ -36,7 +40,7 @@ class BMU(self, deviceAdd):
         Reads the voltage of cell 3
         returns the value in mV
         """ 
-        cell_3= self.smbusRead(cmd.CellVoltage3)
+        cell_3= self.smbusRead(cmd.cellVoltage3)
         cell_3_voltage= cell_3[1]<<8 | cell_3[0]
         return cell_3_voltage
     
@@ -45,7 +49,7 @@ class BMU(self, deviceAdd):
         Reads the voltage of cell 4
         Returns the value in mV
         """ 
-        cell_4= self.smbusRead(cmd.CellVoltage4)
+        cell_4= self.smbusRead(cmd.cellVoltage4)
         cell_4_voltage= cell_4[1]<<8 | cell_4[0]
         return cell_4_voltage
     
@@ -65,7 +69,7 @@ class BMU(self, deviceAdd):
         Returns nothing
         """
         val = [0x01<<1, (cmd.LEDToggle & 0xFF), ((cmd.LEDToggle>>8) & 0xFF)]
-        smbusWrite(val)
+        self.smbusWrite(val)
 
     def toggle_CHG_FET(self):
         """
@@ -73,7 +77,7 @@ class BMU(self, deviceAdd):
         Returns nothing
         """
         val1=[0x01<<1, cmd.CHGFetToggle , 0x00]
-        smbusWrite(val1)
+        self.smbusWrite(val1)
         
     def toggle_DCHG_FET(self):
         """
@@ -81,7 +85,7 @@ class BMU(self, deviceAdd):
         Returns nothing
         """
         val2=[0x01<<1, cmd.DSGFetToggle , 0x00]
-        smbusWrite(val2)
+        self.smbusWrite(val2)
         
     def temp_read (self):
         """ 
@@ -109,9 +113,18 @@ class BMU(self, deviceAdd):
 
 if __name__ == '__main__':
 
-    bmu = BMU(0x0B)
+    bmu = BMU(0x0B, 1)
 
     while True:
         print "Important values"
-        bmu.totalCellVoltage()
+        bmu.toggleLED()
+        bmu.toggle_DCHG_FET()
+        print "Cell 1:", bmu.cell_1_Voltage()
+        print "Cell 2:", bmu.cell_2_Voltage()
+        print "Cell 3:", bmu.cell_3_Voltage()
+        print "total cell voltage:", bmu.totalCellVoltage()
+        print "Temp:", bmu.temp_read()
+
+
+
         sleep(1)
