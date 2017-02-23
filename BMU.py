@@ -49,6 +49,15 @@ class BMU(self, deviceAdd):
         cell_4_voltage= cell_4[1]<<8 | cell_4[0]
         return cell_4_voltage
     
+    def cell_5_Voltage(self):
+        """
+        Reads the voltage of cell 5
+        Returns the value in mV
+        """ 
+        cell_4= self.smbusRead(cmd.CellVoltage4)
+        cell_4_voltage= cell_5[1]<<8 | cell_4[0]
+        return cell_4_voltage
+    
     def totalCellVoltage(self):
         """
         Reads individual cell and sum it up
