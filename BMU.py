@@ -130,11 +130,28 @@ class BMU(object):
         """
         temp = self.smbusRead(cmd.fullChargeCapacity)
         return ((temp[1] << 8) | temp[0])
- 
-    """-------------Perment Failure Inidcation-------------"""
 
-   
-    """-------------Helper Function------------------------"""
+    """ ---------------Remaining time alarm----------------"""
+    #To check if its a read or write
+    def time_remaining(self):
+        """
+        by default sets the alarm when
+        battery will finish in 10 minutes
+        """
+        val3=[0x01<<1, cmd.remainingTimeAlarm, 0x00]
+        self.smbusWrite(val3)
+        
+    """-------------Perment Failure Inidcation-------------"""
+    def permanent_failure(self):
+        """
+        enable/disables permanent
+        failure protections
+        """
+        val5=[0x01<<1, cmd.permanentFailure, 0x00]
+        self.smbusWrite(val5)
+
+        """-------------Helper Function------------------------"""
+
     def smbusRead(self, value):
         """
         Helper function to read smbus
