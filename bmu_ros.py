@@ -47,7 +47,14 @@ class battManagement(object):
         self.bmu_msg.cellVolt2          = self.bmu.cell_voltage(2)
         self.bmu_msg.cellVolt3          = self.bmu.cell_voltage(3)
         self.bmu_msg.totalVoltage       = self.bmu.totalCellVoltage()
-        self.bmu_msg.timeRemaining      = self.bmu.time_remaining() 
+
+        #TODO time remaining returns none type that cause publisher to fail
+        #TODO check if when time_remaining returns a proper value the if condition still works
+        temp = self.bmu.time_remaining()
+        if (temp):
+            self.bmu_msg.timeRemaining = self.bmu.time_remaining() 
+        else:
+            self.bmu_msg.time_remaining = -1.0
         
         #TODO: Add permanent failures, if fail, do something
         #TODO: remove this after correction
@@ -55,7 +62,7 @@ class battManagement(object):
         #self.bmu_msg.permanentFailures  = self.bmu.
 
         #Publish message
-        self.pub(self.bmu_msg)
+        self.pub.publish(self.bmu_msg)
 
 if __name__ == '__main__':
     batt = battManagement()
