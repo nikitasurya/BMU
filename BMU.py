@@ -150,6 +150,44 @@ class BMU(object):
         val5=[0x01<<1, cmd.permanentFailure, 0x00]
         self.smbusWrite(val5)
 
+    """-------------Status Registers ----------------------"""
+    """ Reads the status registers of the name of the method
+        Returns 32 bit value unless otherwise stated"""
+    def operationStatusReg(self): 
+        temp = self.smbusRead(cmd.operationStatus)
+        return ((temp[3] << 24) | (temp[2] << 16) | (temp[1] << 8) | temp[0])
+
+    def gaugingStatusReg(self):   
+        """ Return 16 bit"""
+        temp = self.smbusRead(cmd.gaugingStatus)
+        return ((temp[1] << 8) | temp[0])
+
+    def safetyAlertReg(self):
+        temp = self.smbusRead(cmd.safetyAlert)
+        return ((temp[3] << 24) | (temp[2] << 16) | (temp[1] << 8) | temp[0])
+
+    def safetyStatusReg(self):
+        temp = self.smbusRead(cmd.safetyStatus)
+        return ((temp[3] << 24) | (temp[2] << 16) | (temp[1] << 8) | temp[0])
+
+    def PFStatusReg(self):
+        temp = self.smbusRead(cmd.PFStatus)
+        return ((temp[3] << 24) | (temp[2] << 16) | (temp[1] << 8) | temp[0])
+
+    def PFAlertReg(self):
+        temp = self.smbusRead(cmd.PFAlert)
+        return ((temp[3] << 24) | (temp[2] << 16) | (temp[1] << 8) | temp[0])
+
+    def chargingStatusReg(self):
+        temp = self.smbusRead(cmd.chargingStatus)
+        return ((temp[3] << 24) | (temp[2] << 16) | (temp[1] << 8) | temp[0])
+    
+    def manufacturingStatusReg(self):
+        """Returns 16 bit"""
+        temp = self.smbusRead(cmd.manufacturingStatus)
+        return ((temp[1] << 8) | temp[0])
+
+
         """-------------Helper Function------------------------"""
 
     def smbusRead(self, value):
