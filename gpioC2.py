@@ -16,6 +16,11 @@ def write(data, pin):
 
 def read(pin):
     os.system("cat " + "/sys/class/gpio/gpio" + pin + "/value")
+    try:
+          with open("/sys/class/gpio/gpio" + pin + "/value") as pin:
+                  return pin.read(1)
+    except:
+          print "Remember to export the pin first!"
 
 class PIN:
     PIN7    = "249"
