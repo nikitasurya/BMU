@@ -17,6 +17,7 @@ class BMU(object):
         else:
             self.bus1 = SMBus(busnum)
     
+    
     """------------Voltage Reading------------------------"""
     def cell_voltage(self, num): 
         """
@@ -102,6 +103,15 @@ class BMU(object):
         val2=[0x01<<1, cmd.DSGFetToggle , 0x00]
         self.smbusWrite(val2)
     
+    """ ----------------Device Reset-----------------------"""
+    def device_reset(self)
+        """ 
+        Resets the device
+        """
+        val4=[0x01<<1, cmd.deviceReset , 0x00]
+        self.smbusWrite(val4)
+        
+
     """------------Temperature Reading -------------------"""
     def temp_read (self):
         """ 

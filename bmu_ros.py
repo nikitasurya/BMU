@@ -20,9 +20,10 @@ class battManagement(object):
         
         #Setup GPIO to output
         #Go to odroid website to get which wiringPi pin to use
-        self.pin22 = 6
-        self.pin24 = 10
+        self.pin22 = 6  #KILL
+        self.pin24 = 10 #INTERRUPT 
         wpi.wiringPiSetup()
+        #mentioning pin mode of KILL and INT
         wpi.pinMode(self.pin22,1)
         wpi.pinMode(self.pin24,0)
 
@@ -46,40 +47,59 @@ class battManagement(object):
 
         #Create BMU instance
         self.bmu = BMU(0x0B,1)
-        self.bmu.toggle_DCHG_FET()
+        self.onDCHG()
+        #The KILL function is initiated after 5 seconds so that the LTC2954-2 is not getting commands during the lockout time
+        time.sleep(5)
         wpi.digitalWrite(self.pin22,0)
+      
+
+    def onDCHG(self):
+        """
+        To turn ON the DCHG FET 
+        Whatever be the previous status of the FET
+        """
+        flag = 0
+        flag = self.bmu.manufacturingStatusReg()
+        print bin(flag)
+        print format(flag, '#04X')
+
+       
+        if((0x04 & flag) == 0):
+            print "toggle"
+            self.bmu.toggle_DCHG_FET()
+
+
+    def offDCHG(self):
+        """
+        To turn OFF the DCHG FET 
+        Whatever be the previous status
+        """
+        flag = self.bmu.operationStatusReg()
+        if (0x0002 & flag):
+            self.bmu.toggle_DCHG_FET()
+
+        print flag
+
+
 
     def _checkState(self):
         #TODO check if current too high
         #TODO check if voltage is too low
-        #If push button is pressed
-        if(wpi.digitalRead(self.pin24)):
+       print "Push the button to turn ON the push button circuit"
+       wpi.digitalWrite(self.pin22,1)
+       time.sleep(5)
+       print "Push Button circuit is ON"
+       print "Push and hold for 5 seconds to turn OFF the push button circuit"
+       if(wpi.digitalRead(self.pin24)==0):
             #TODO print telementry asking the user to press button again
-            print "Please press and hold the button again within 5 seconds"
-            #Poll for 5 seconds to determine if user really wants to shutdown
-            time.sleep(2.5)
-            wpi.digitalWrite(self.pin22,1)
-            now = time.time()
-            button = False
-
-            while (time.time() < now + timeDelay):
-                #If button is pressed again
-                if(wpi.digitalRead(self.pin24)):
-                    button = True
-                    break
-
-            if(button):
-                now = time.time()
-                while(time.time() < now + timeDelay):
-                    #if the button is released before 5 seconds, return and do not shutdown
-                    if(wpi.digitalRead(self.pin24)== 0):
-                        print "False shutdown"
-                        wpi.digitalWrite(self.pin22,0)
-                        return False
-                print "Initiating Shutdown"
-                return True
-
-
+            print "Turn OFF initiated"
+            time.sleep(4)
+            if (wpi.digitalRead(self.pin24)==0):
+                print "turning OFF"
+                wpi.digitalWrite(self.pin22,0)
+            
+    
+    
     def _update(self):
         self.bmu_msg.remainingCapacity  = self.bmu.remainingCapacity()
         self.bmu_msg.cellVolt1          = self.bmu.cell_voltage(1)
@@ -100,7 +120,7 @@ class battManagement(object):
         self.bmu_msg.permanentFailures  = 0.0
         #self.bmu_msg.permanentFailures  = self.bmu.
 
-        #Publish message
+     #Publish message
         self.pub.publish(self.bmu_msg)
         
 
