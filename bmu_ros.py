@@ -120,7 +120,7 @@ class battManagement(object):
         self.bmu_msg.permanentFailures  = 0.0
         #self.bmu_msg.permanentFailures  = self.bmu.
 
-     #Publish message
+        #Publish message
         self.pub.publish(self.bmu_msg)
         
 
