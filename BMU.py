@@ -163,7 +163,7 @@ class BMU(object):
         Whatever be the previous status
         """
         flag = self.operationStatusReg()
-        if (0x0002 & flag):
+        if (0x0004 & flag):
             print "toggle Charge"
             self.toggle_CHG_FET()
 
