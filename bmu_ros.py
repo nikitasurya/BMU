@@ -19,7 +19,9 @@ class battManagement(object):
     def __init__(self):
        
         self.button_flag = False
-        self.timenow = 0.0
+        self.timenow = time.time()
+        self.pushButtonOff = self.timenow
+
         #Setup GPIO to output
         #Go to odroid website to get which wiringPi pin to use
         self.pin22 = 6  #interrupt
@@ -79,6 +81,13 @@ class battManagement(object):
                 time.sleep(0.5)
                 wpi.digitalWrite(self.pin24,1)
                 self.button_flag = False
+        
+        #Periodically make sure that push button is off this is required because when the bmu decides to turn off power due to some unsafe flag being triggered, the push button circuit negates this safety feature if it is turned on as it provides an alternative route for power to pass.
+        if(time.time() > self.pushButtonOff + 30 and self.button_flag == False):
+            self.pushButtonOff = time.time()
+            wpi.digitalWrite(self.pin24,0)
+            time.sleep(0.5)
+            wpi.digitalWrite(self.pin24,1)
 
         #TODO print telementry asking the user to press button again
    
