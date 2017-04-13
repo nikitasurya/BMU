@@ -17,18 +17,20 @@ timeDelay = 5.0
 class battManagement(object):
     
     def __init__(self):
-        
+       
+        self.button_flag = False
+        self.timenow = 0.0
         #Setup GPIO to output
         #Go to odroid website to get which wiringPi pin to use
-        self.pin22 = 6  #KILL
-        self.pin24 = 10 #INTERRUPT 
+        self.pin22 = 6  #interrupt
+        self.pin24 = 10 #kill 
         wpi.wiringPiSetup()
         #mentioning pin mode of KILL and INT
-        wpi.pinMode(self.pin22,1)
-        wpi.pinMode(self.pin24,0)
+        wpi.pinMode(self.pin22,0)
+        wpi.pinMode(self.pin24,1)
 
         #Kill pin is active low
-        wpi.digitalWrite(self.pin22,1)
+        wpi.digitalWrite(self.pin24,1)
 
         #Initializing ROS parameteres
         rospy.init_node('BMU_node', anonymous=True)
@@ -47,58 +49,39 @@ class battManagement(object):
 
         #Create BMU instance
         self.bmu = BMU(0x0B,1)
-        self.onDCHG()
+        self.bmu.onDCHG()
         #The KILL function is initiated after 5 seconds so that the LTC2954-2 is not getting commands during the lockout time
-        time.sleep(5)
-        wpi.digitalWrite(self.pin22,0)
-      
-
-    def onDCHG(self):
-        """
-        To turn ON the DCHG FET 
-        Whatever be the previous status of the FET
-        """
-        flag = 0
-        flag = self.bmu.manufacturingStatusReg()
-        print bin(flag)
-        print format(flag, '#04X')
-
-       
-        if((0x04 & flag) == 0):
-            print "toggle"
-            self.bmu.toggle_DCHG_FET()
-
-
-    def offDCHG(self):
-        """
-        To turn OFF the DCHG FET 
-        Whatever be the previous status
-        """
-        flag = self.bmu.operationStatusReg()
-        if (0x0002 & flag):
-            self.bmu.toggle_DCHG_FET()
-
-        print flag
-
-
+        time.sleep(3)
+        wpi.digitalWrite(self.pin24,0)#Turns off push button by setting kill to low.
+        print "Push Button off"
+        time.sleep(3)
+        wpi.digitalWrite(self.pin24,1)#Sets kill to high, but this does not turn on the push button but prepares it in the event that it is turned on
+        
 
     def _checkState(self):
         #TODO check if current too high
         #TODO check if voltage is too low
-       print "Push the button to turn ON the push button circuit"
-       wpi.digitalWrite(self.pin22,1)
-       time.sleep(5)
-       print "Push Button circuit is ON"
-       print "Push and hold for 5 seconds to turn OFF the push button circuit"
-       if(wpi.digitalRead(self.pin24)==0):
-            #TODO print telementry asking the user to press button again
-            print "Turn OFF initiated"
-            time.sleep(4)
-            if (wpi.digitalRead(self.pin24)==0):
-                print "turning OFF"
-                wpi.digitalWrite(self.pin22,0)
-            
-    
+
+        if(self.button_flag and time.time() > self.timenow+5):
+            print "Turn off initiated"
+
+        if(wpi.digitalRead(self.pin22) == 0):
+            print self.timenow , "True"
+            if(self.button_flag == False):
+                self.timenow = time.time()
+                self.button_flag = True
+        else:
+            #print "False"
+            if(self.button_flag == True):
+                #if button was pressed but false shutdown
+                print "Push Button Off"
+                wpi.digitalWrite(self.pin24,0)
+                time.sleep(0.5)
+                wpi.digitalWrite(self.pin24,1)
+                self.button_flag = False
+
+        #TODO print telementry asking the user to press button again
+   
     
     def _update(self):
         self.bmu_msg.remainingCapacity  = self.bmu.remainingCapacity()

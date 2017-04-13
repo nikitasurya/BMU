@@ -122,7 +122,52 @@ class BMU(object):
         """
         val2=[0x01<<1, cmd.DSGFetToggle , 0x00]
         self.smbusWrite(val2)
-    
+
+    def onDCHG(self):
+        """
+        To turn ON the DCHG FET
+        Whatever be the previous status of the FET
+        """
+        flag = 0
+        flag = self.operationStatusReg()
+
+        if((0x02 & flag) == 0):
+            print "toggle Discharge"
+            self.toggle_DCHG_FET()
+
+    def offDCHG(self):
+        """
+        To turn OFF the DCHG FET
+        Whatever be the previous status
+        """
+        flag = self.operationStatusReg()
+        if (0x0002 & flag):
+            print "toggle Discharge"
+            self.toggle_DCHG_FET()
+
+    def onCHG(self):
+        """
+        To turn ON the CHG FET
+        Whatever be the previous status of the FET
+        """
+        flag = 0
+        flag = self.operationStatusReg()
+
+        if((0x04 & flag) == 0):
+            print "toggle Charge"
+            self.toggle_CHG_FET()
+
+    def offCHG(self):
+        """
+        To turn OFF the CHG FET
+        Whatever be the previous status
+        """
+        flag = self.operationStatusReg()
+        if (0x0002 & flag):
+            print "toggle Charge"
+            self.toggle_CHG_FET()
+
+
     """ ----------------Device Reset-----------------------"""
     def device_reset(self):
         """ 
